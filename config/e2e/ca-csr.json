@@ -1,0 +1,16 @@
+{
+  "CN": "ExampleCA",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "UK",
+      "L": "Bristol",
+      "O": "Jetstack",
+      "OU": "Cert-Manager",
+      "ST": "England"
+    }
+  ]
+}
