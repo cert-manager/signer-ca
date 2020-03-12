@@ -1,5 +1,18 @@
-# Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+MAKEFLAGS += --warn-undefined-variables
+SHELL := bash
+.SHELLFLAGS := -eu -o pipefail -c
+.DELETE_ON_ERROR:
+.SUFFIXES:
+
+# The semver version number which will be used as the Docker image tag
+# Defaults to the output of git describe.
+VERSION ?= $(shell git describe --tags --dirty --always)
+
+# Docker image name parameters
+DOCKER_PREFIX ?= quay.io/cert-manager/signer-ca-
+DOCKER_TAG ?= ${VERSION}
+DOCKER_IMAGE ?= ${DOCKER_PREFIX}controller:${DOCKER_TAG}
+
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
@@ -11,6 +24,9 @@ GOBIN=$(shell go env GOBIN)
 endif
 
 ARGS ?=
+
+BIN := ${CURDIR}/bin
+export PATH := ${BIN}:${PATH}
 
 all: manager
 
@@ -28,7 +44,7 @@ run:
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
-	cd config/manager && kustomize edit set image controller=${IMG}
+	cd config/manager && kustomize edit set image controller=${DOCKER_IMAGE}
 	kustomize build config/default | kubectl apply -f -
 
 E2E_PKI = config/e2e
@@ -43,7 +59,7 @@ ${E2E_CA}:
 	mv ${E2E_PKI}/tls{-key.pem,.key}
 
 deploy-e2e: ${E2E_CA}
-	cd config/e2e && kustomize edit set image controller=${IMG}
+	cd config/e2e && kustomize edit set image controller=${DOCKER_IMAGE}
 	kustomize build config/e2e | kubectl apply -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
@@ -64,11 +80,11 @@ generate: controller-gen
 
 # Build the docker image
 docker-build:
-	docker build . -t ${IMG}
+	docker build . -t ${DOCKER_IMAGE}
 
 # Push the docker image
 docker-push:
-	docker push ${IMG}
+	docker push ${DOCKER_IMAGE}
 
 # find or download controller-gen
 # download controller-gen if necessary
