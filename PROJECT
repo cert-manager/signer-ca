@@ -1,0 +1,3 @@
+domain: cert-manager.io
+repo: github.com/cert-manager/signer-ca
+version: "2"
