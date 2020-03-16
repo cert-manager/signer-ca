@@ -17,7 +17,7 @@ See `config/e2e` for an example of how to make a `CA` file available to the oper
 
 # Build
 
-You can build and deploy `signer-ca` using `make docker-build docker-push deploy-e2e IMG=gcr.io/<YOUR_PROJECT>/controller:test`.
+You can build and deploy `signer-ca` using `make docker-build docker-push deploy-e2e DOCKER_PREFIX=gcr.io/<YOUR_PROJECT>/signer-ca/`.
 See the `Makefile` for details.
 
 # Demo
