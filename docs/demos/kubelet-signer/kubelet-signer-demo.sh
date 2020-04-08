@@ -31,16 +31,7 @@ until kubectl get nodes; do
     sleep 1
 done
 
-logger -s "Copying Cluster CA"
-docker cp kind-control-plane:/etc/kubernetes/pki/ca.key .
-docker cp kind-control-plane:/etc/kubernetes/pki/ca.crt .
-
-logger -s "Starting signer-ca"
-${ROOT_DIR}/bin/manager \
-   --ca-key-path=${PWD}/ca.key \
-   --ca-cert-path=${PWD}/ca.crt \
-   --signer-name=kubernetes.io/kube-apiserver-client-kubelet &
-RUN_JOB="${!}"
+kind load
 
 logger -s "Waiting for kind create cluster to complete"
 wait ${KIND_JOB}
