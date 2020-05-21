@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signer-ca-controller-manager
+  namespace: signer-ca-system
+spec:
+  template:
+    spec:
+      containers:
+        - name: manager
+          volumeMounts:
+            - name: k8s-certs
+              mountPath: /etc/kubernetes/pki
+              readOnly: true
+          args:
+            - --enable-leader-election
+            - --ca-key-path=/etc/kubernetes/pki/ca.key
+            - --ca-cert-path=/etc/kubernetes/pki/ca.crt
+            - --signer-name=kubernetes.io/kube-apiserver-client-kubelet
+      volumes:
+        - name: k8s-certs
+          hostPath:
+            type: DirectoryOrCreate
+            path: /etc/kubernetes/pki
+      # Copied from Pod kube-controller-manager-kind-control-plane
+      tolerations:
+      - effect: NoExecute
+        operator: Exists
+      nodeName: kind-control-plane
+      priority: 2000000000
+      priorityClassName: system-cluster-critical

@@ -12,6 +12,7 @@ VERSION ?= $(shell git describe --tags --dirty --always)
 DOCKER_PREFIX ?= quay.io/cert-manager/signer-ca-
 DOCKER_TAG ?= ${VERSION}
 DOCKER_IMAGE ?= ${DOCKER_PREFIX}controller:${DOCKER_TAG}
+export DOCKER_IMAGE
 
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
@@ -62,6 +63,10 @@ deploy-e2e: ${E2E_CA}
 	cd config/e2e && kustomize edit set image controller=${DOCKER_IMAGE}
 	kustomize build config/e2e | kubectl apply -f -
 
+deploy-k8s-bootstrap:
+	cd config/k8s-bootstrap && kustomize edit set image controller=${DOCKER_IMAGE}
+	kustomize build config/k8s-bootstrap | kubectl apply -f -
+
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
@@ -104,5 +109,5 @@ CONTROLLER_GEN=$(shell which controller-gen)
 endif
 
 .PHONY: demo-kubelet-signer
-demo-kubelet-signer: manager
+demo-kubelet-signer: docker-build
 	docs/demos/kubelet-signer/kubelet-signer-demo.sh
