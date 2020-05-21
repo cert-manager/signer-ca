@@ -102,3 +102,7 @@ CONTROLLER_GEN=$(GOBIN)/controller-gen
 else
 CONTROLLER_GEN=$(shell which controller-gen)
 endif
+
+.PHONY: demo-kubelet-signer
+demo-kubelet-signer: manager
+	docs/demos/kubelet-signer/kubelet-signer-demo.sh
