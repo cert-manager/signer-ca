@@ -12,7 +12,7 @@ The signed certificate is added to the `.status.certificate` of the `CSR` resour
 
 # Installation
 
-`signer-ca` can be deployed using `kubectl -k config/default`.
+`signer-ca` can be deployed using `kubectl apply -k config/default`.
 See `config/e2e` for an example of how to make a `CA` file available to the operator, as a mounted secret.
 
 # Build
